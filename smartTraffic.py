@@ -181,6 +181,8 @@ class Simulator():
 
         # start moving loop
 
+        global_time = 0
+
         while len(self.arrived_cyclist)<self.cyclist_number:
 
             # input traffic light control
@@ -193,11 +195,32 @@ class Simulator():
                 if i.arrived == 1:
                     continue
 
+                # find next light
+                next_light = None
+
+                for j in self.light_list_by_position:
+                    if i.position < j:
+                        next_light = j
+                        break
+
+                # check next light, if not in range, move
+                if i.position + i.speed <= next_light.position:
+                    # not in range, move
+                    i.position = i.position + i.speed
+                    # add travel time
+                    i.travel_time = i.travel_time + 1
+                else:
+                    # in range, check color
+                    print('haha')
+
+                    # if cross a light, add one for total served
+
+
+                # check if arrived, > road_length
 
 
 
-
-
+# (ID, cyclist number, light number)
 simulation1 = Simulator(1, 100, 10)
 simulation1.run()
 
