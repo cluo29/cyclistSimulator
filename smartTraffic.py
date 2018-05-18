@@ -56,11 +56,13 @@ class Traffic_Light():
 
 class Simulator():
     # initialization function
-    def __init__(self, ID, cyclist_number, light_number):
+    def __init__(self, ID, cyclist_number, light_number, policy):
         self.ID = ID
         self.road_length = 0
         self.cyclist_number = cyclist_number
         self.light_number = light_number
+        
+        self.policy =policy
 
         self.cyclist_list = []
         self.cyclist_list_by_speed = []
@@ -211,17 +213,33 @@ class Simulator():
                     i.travel_time = i.travel_time + 1
                 else:
                     # in range, check color
-                    print('haha')
 
-                    # if cross a light, add one for total served
+                    if next_light.state == 'v':
+                        i.position = i.position + i.speed
+                        # add travel time
+                        i.travel_time = i.travel_time + 1
+                        # if cross a light, add one for total served
+                        # TODO
+                    else:
+                        i.waiting_time = i.waiting_time + 1
+
+            # control light using policy
+            
+            # using self.policy
+            
+
+
+            print('haha')
+
+
 
 
                 # check if arrived, > road_length
 
 
 
-# (ID, cyclist number, light number)
-simulation1 = Simulator(1, 100, 10)
+# (ID, cyclist number, light number, policy number)
+simulation1 = Simulator(1, 100, 10, 1)
 simulation1.run()
 
 
