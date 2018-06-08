@@ -44,7 +44,7 @@ class Traffic_Light():
         # timer to count down, when 0 change
         self.timer = timer
         self.transition = 0
-        self.served = 0
+
 
     def change(self):
         if self.state == 'v':
@@ -70,6 +70,8 @@ class Simulator():
         self.light_list = []
         self.light_list_by_position = []
         self.arrived_cyclist = []
+
+        self.served = 0
 
     def run(self):
         # create a ROAD from GPX
@@ -199,7 +201,7 @@ class Simulator():
 
 
         # start moving loop
-        # TODO Jun 8
+        #
 
         global_time = 0
 
@@ -207,7 +209,7 @@ class Simulator():
 
             # input traffic light control
 
-            # move each of them
+            # move each of cyclists
             # count metrics
 
             for i in self.cyclist_list_by_speed:
@@ -237,18 +239,28 @@ class Simulator():
                         # add travel time
                         i.travel_time = i.travel_time + 1
                         # if cross a light, add one for total served
-                        # TODO
+                        self.served = self.served + 1
                     else:
                         i.waiting_time = i.waiting_time + 1
 
-
-                # check if arrived, > road_length
+                if i.position >= self.road_length:
+                    i.arrived = 1
+                    self.arrived_cyclist.append(i)
 
             # control light using policy
 
+            # for each light
+
+            for i in self.light_list_by_position:
+
+                print()
+                # 1st time, it is red forever, until policy
+
+                # then 15s loops of red-green
+
             # using self.policy
 
-
+            global_time = global_time + 1
 
             print('haha')
 
