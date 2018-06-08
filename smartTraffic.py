@@ -43,6 +43,7 @@ class Traffic_Light():
         self.state = state
         # timer to count down, when 0 change
         self.timer = timer
+        self.period = timer
         self.initiated = False
         self.transition = 0
 
@@ -52,6 +53,7 @@ class Traffic_Light():
             self.state = 'p'
         else:
             self.state = 'v'
+        self.timer = self.period
         self.transition = self.transition + 1
 
 
@@ -124,22 +126,25 @@ class Simulator():
             if self.cyclist_number == cyclist_count:
                 break
 
+        """
         for i in self.cyclist_list:
             print("---cyclist_list---")
             print(i.ID)
             print(i.speed)
             print(i.position)
+        """
 
         # sort cyclist
         cyclist_list_by_speed = list(self.cyclist_list)
 
         cyclist_list_by_speed = sorted(cyclist_list_by_speed, key=lambda cyclist: cyclist.speed)
 
+        """
         for i in cyclist_list_by_speed:
             print("---cyclist_list_by_speed---")
             print(i.ID)
             print(i.speed)
-
+        """
 
         self.cyclist_list_by_speed = list(cyclist_list_by_speed)
 
@@ -155,7 +160,7 @@ class Simulator():
 
         for i in distribution1:
 
-            if self.road_length> i > 1:
+            if self.road_length> i > self.geof:
 
                 locus = int(round(i))
 
@@ -208,6 +213,8 @@ class Simulator():
 
         while len(self.arrived_cyclist)<self.cyclist_number:
 
+
+
             # input traffic light control
 
             # move each of cyclists
@@ -220,14 +227,21 @@ class Simulator():
 
                 # find next light
                 next_light = None
-
+                flag_no_next_light = True
                 for j in self.light_list_by_position:
                     if i.position < j.position:
                         next_light = j
+                        flag_no_next_light = False
                         break
 
+                if flag_no_next_light:
+                    # not light
+                    i.position = i.position + i.speed
+                    # add travel time
+                    i.travel_time = i.travel_time + 1
+
                 # check next light, if not in range, move
-                if i.position + i.speed <= next_light.position:
+                elif i.position + i.speed <= next_light.position:
                     # not in range, move
                     i.position = i.position + i.speed
                     # add travel time
@@ -254,22 +268,75 @@ class Simulator():
 
             for i in self.light_list_by_position:
 
-                print()
                 # 1st time, it is red forever, until policy
                 if i.initiated == False:
                     # check policy
-                    print()
+
+                    if self.policy == 1:
+
+                        for j in self.cyclist_list_by_speed:
+
+                            # j in i geof 1st slot
+                            if  i.position - (self.geof * 2 /3 ) >= j.position >= i.position - self.geof:
+
+                                i.initiated = True
+                                i.change()
+
+                    if self.policy == 2:
+
+                        for j in self.cyclist_list_by_speed:
+
+                            # j in i geof 1st slot
+                            if i.position - (self.geof * 1 / 3) >= j.position >= i.position - (self.geof * 2 /3 ):
+                                i.initiated = True
+                                i.change()
+
+                    if self.policy == 3:
+
+                        for j in self.cyclist_list_by_speed:
+
+                            # j in i geof 1st slot
+                            if i.position  >= j.position >= i.position - (self.geof * 1 /3 ):
+                                i.initiated = True
+                                i.change()
+
                 else:
                     #  15s loops of red-green
+                    if i.timer == 0:
+                        i.change()
+                    else:
+                        i.timer = i.timer - 1
 
-
-
-
-            # using self.policy
 
             global_time = global_time + 1
 
-            print('haha')
+            #print('clock = ', global_time)
+
+        # count metrics
+
+        travel_time = 0
+        waiting_time = 0
+
+        for i in self.cyclist_list_by_speed:
+            travel_time = travel_time + i.travel_time
+            waiting_time = waiting_time + i.waiting_time
+
+        avg_waiting_time = waiting_time/self.cyclist_number
+        print('WAT = ', avg_waiting_time)
+
+        avg_speed = self.road_length * self.cyclist_number / (waiting_time + travel_time)
+        print('AS = ', avg_speed)
+
+        transitions = 0
+        for i in self.light_list_by_position:
+            transitions = transitions + i.transition
+
+        NCS = self.served / transitions
+        print('NCS = ', NCS)
+
+        print('NTL = ', transitions)
+
+
 
 
 
@@ -281,7 +348,7 @@ class Simulator():
 
 # interval is min distance between lights
 
-simulation1 = Simulator(1, 100, 10, 1, 30, 60)
+simulation1 = Simulator(1, 1000, 10, 1, 15, 60)
 simulation1.run()
 
 
