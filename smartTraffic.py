@@ -2,7 +2,7 @@
 # Cyclists simulation
 #
 # author: Chu Luo
-# date 2018, 03, 15
+# date 2018, 06, 08
 
 import numpy as np
 
@@ -56,12 +56,13 @@ class Traffic_Light():
 
 class Simulator():
     # initialization function
-    def __init__(self, ID, cyclist_number, light_number, policy):
+    def __init__(self, ID, cyclist_number, light_number, policy, geof, interval):
         self.ID = ID
         self.road_length = 0
         self.cyclist_number = cyclist_number
         self.light_number = light_number
-        
+        self.geof = geof
+        self.interval = interval
         self.policy =policy
 
         self.cyclist_list = []
@@ -141,8 +142,11 @@ class Simulator():
 
         # create TRAFFIC LIGHTS
 
+        # user input: period, how many seconds to change color
+        period = 15
 
-        distribution1 = np.random.normal(self.road_length/2, 100, self.light_number*2)
+
+        distribution1 = np.random.choice(self.road_length, self.road_length, replace=False)
 
         light_count = 0
 
@@ -150,9 +154,22 @@ class Simulator():
 
             if self.road_length> i > 1:
 
-                if not (int(round(i)) in self.light_list):
+                locus = int(round(i))
 
-                    light_temp = Traffic_Light(light_count, int(round(i)), 'p',19 )
+                # if not (int(round(i)) in self.light_list):
+
+                # flag to add light to this locus
+                flag = True
+
+                # if two lights are far enough (geofences dont overlap)
+                for j in self.light_list:
+
+                    if abs(locus - j.position) < self.interval:
+
+                        flag = False
+
+                if flag:
+                    light_temp = Traffic_Light(light_count, locus, 'p', period )
 
                     self.light_list.append(light_temp)
 
@@ -182,6 +199,7 @@ class Simulator():
 
 
         # start moving loop
+        # TODO Jun 8
 
         global_time = 0
 
@@ -201,7 +219,7 @@ class Simulator():
                 next_light = None
 
                 for j in self.light_list_by_position:
-                    if i.position < j:
+                    if i.position < j.position:
                         next_light = j
                         break
 
@@ -223,10 +241,13 @@ class Simulator():
                     else:
                         i.waiting_time = i.waiting_time + 1
 
+
+                # check if arrived, > road_length
+
             # control light using policy
-            
+
             # using self.policy
-            
+
 
 
             print('haha')
@@ -234,12 +255,11 @@ class Simulator():
 
 
 
-                # check if arrived, > road_length
 
 
 
-# (ID, cyclist number, light number, policy number)
-simulation1 = Simulator(1, 100, 10, 1)
+# (ID, cyclist number, light number, policy number, geofence, interval)
+simulation1 = Simulator(1, 100, 10, 1, 30, 60)
 simulation1.run()
 
 
