@@ -59,7 +59,7 @@ class Traffic_Light():
 
 class Simulator():
     # initialization function
-    def __init__(self, ID, cyclist_number, light_number, policy, geof, interval):
+    def __init__(self, ID, cyclist_number, light_number, policy, geof, interval, period):
         self.ID = ID
         self.road_length = 0
         self.cyclist_number = cyclist_number
@@ -73,6 +73,8 @@ class Simulator():
         self.light_list = []
         self.light_list_by_position = []
         self.arrived_cyclist = []
+
+        self.period = period
 
         self.served = 0
 
@@ -151,7 +153,7 @@ class Simulator():
         # create TRAFFIC LIGHTS
 
         # user input: period, how many seconds to change color
-        period = 15
+        period = self.period
 
 
         distribution1 = np.random.choice(self.road_length, self.road_length, replace=False)
@@ -336,6 +338,7 @@ class Simulator():
 
         print('NTL = ', transitions)
 
+        print('NTL is the sum of all lights')
 
 
 
@@ -343,12 +346,13 @@ class Simulator():
 
 
 
-
-# (ID, cyclist number, light number, policy number, geofence, interval)
+# (ID, cyclist number, light number, policy number, geofence, interval, period)
 
 # interval is min distance between lights
 
-simulation1 = Simulator(1, 1000, 10, 1, 15, 60)
+# period is how many seconds the light change between green and red
+
+simulation1 = Simulator(1, 500, 10, 1, 15, 60, 15)
 simulation1.run()
 
 
