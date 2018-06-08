@@ -39,10 +39,11 @@ class Traffic_Light():
     def __init__(self, ID, position, state, timer):
         self.ID = ID
         self.position = position
-        # state p stop, v cyclist go
+        # state p stop = red, v cyclist go = green
         self.state = state
         # timer to count down, when 0 change
         self.timer = timer
+        self.initiated = False
         self.transition = 0
 
 
@@ -255,8 +256,14 @@ class Simulator():
 
                 print()
                 # 1st time, it is red forever, until policy
+                if i.initiated == False:
+                    # check policy
+                    print()
+                else:
+                    #  15s loops of red-green
 
-                # then 15s loops of red-green
+
+
 
             # using self.policy
 
@@ -271,6 +278,9 @@ class Simulator():
 
 
 # (ID, cyclist number, light number, policy number, geofence, interval)
+
+# interval is min distance between lights
+
 simulation1 = Simulator(1, 100, 10, 1, 30, 60)
 simulation1.run()
 
